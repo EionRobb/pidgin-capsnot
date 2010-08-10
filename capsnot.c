@@ -135,6 +135,8 @@ static gboolean
 flash_toggle(gpointer data)
 {
 	flash_state = !flash_state;
+	flashes_remaining--;
+	
 	led_set(flash_state);
 	
 	if (!flashes_remaining)
@@ -189,8 +191,9 @@ capsnot_conversation_updated(PurpleConversation *conv,
 	
 	if (has_unseen)
 	{
-		flash_timeout = purple_timeout_add(flashseconds / flashcount / 2, flash_toggle, NULL);
-		flashes_remaining = flashcount;
+		purple_timeout_remove(flash_timeout);
+		flash_timeout = purple_timeout_add(flashseconds * 1000 / flashcount / 2, flash_toggle, NULL);
+		flashes_remaining = flashcount * 2;
 	} else {
 		purple_timeout_remove(flash_timeout);
 		flashes_remaining = 0;
@@ -250,10 +253,12 @@ plugin_config_frame(PurplePlugin *plugin)
 	ppref = purple_plugin_pref_new_with_name_and_label(
 							"/plugins/core/eionrobb-capsnot/flashcount",
 							"Number of flashes");
+	purple_plugin_pref_set_bounds(ppref, 1, 10);
 	purple_plugin_pref_frame_add(frame, ppref);
 	ppref = purple_plugin_pref_new_with_name_and_label(
 							"/plugins/core/eionrobb-capsnot/flashseconds",
 							"Duration of flashes (seconds)");
+	purple_plugin_pref_set_bounds(ppref, 1, 10);
 	purple_plugin_pref_frame_add(frame, ppref);
 	
 	return frame;
@@ -298,7 +303,7 @@ plugin_unload(PurplePlugin *plugin)
     return TRUE;
 }
 
-static PurplePluginUiInfo ui_info = {
+static PurplePluginUiInfo prefs_info = {
 	plugin_config_frame,
 	0,   /* page_num (Reserved) */
 	NULL, /* frame (Reserved) */
@@ -332,9 +337,9 @@ static PurplePluginInfo info = {
     plugin_unload, /* unload */
     NULL,          /* destroy */
 
-    &ui_info,
     NULL,
     NULL,
+    &prefs_info,
     NULL
 };
 

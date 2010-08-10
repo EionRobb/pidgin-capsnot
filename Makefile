@@ -37,3 +37,4 @@ capsnot.so:	${SOURCES}
 
 capsnot.dll:	${SOURCES}
 	${WIN32_COMPILER} ${LIBPURPLE_CFLAGS} -Wall -I. -g -O2 -pipe ${SOURCES} -o $@ -shared -mno-cygwin ${WIN32_CFLAGS} ${WIN32_LIBS}
+	upx $@
