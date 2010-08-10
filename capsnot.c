@@ -139,7 +139,7 @@ flash_toggle(gpointer data)
 	
 	led_set(flash_state);
 	
-	if (!flashes_remaining)
+	if (flashes_remaining <= 0)
 	{
 		if (flash_state)
 		{
@@ -192,10 +192,9 @@ capsnot_conversation_updated(PurpleConversation *conv,
 	if (has_unseen)
 	{
 		purple_timeout_remove(flash_timeout);
-		flash_timeout = purple_timeout_add(flashseconds * 1000 / flashcount / 2, flash_toggle, NULL);
 		flashes_remaining = flashcount * 2;
+		flash_timeout = purple_timeout_add(flashseconds * 1000 / flashcount / 2, flash_toggle, NULL);
 	} else {
-		purple_timeout_remove(flash_timeout);
 		flashes_remaining = 0;
 	}
 }
@@ -300,7 +299,7 @@ plugin_unload(PurplePlugin *plugin)
 	flashes_remaining = 0;
 	led_set(flash_state = FALSE);
 	
-    return TRUE;
+	return TRUE;
 }
 
 static PurplePluginUiInfo prefs_info = {
