@@ -1,0 +1,1 @@
+A plugin for Pidgin/Finch that will flash your keyboard LEDs when you receive a Chat/IM message
